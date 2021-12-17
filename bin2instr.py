@@ -11,7 +11,7 @@ opcodes_str = {
     0b0010011 : {0b000 : 'addi', 0b001 : 'slli'},
     0b1100011 : {0b000 : 'beq', 0b001 : 'bne', 0b101 : 'bge'},
     0b0110011 : {0b000 : 'add/sub'},
-    0b0100011 : {0b010 : 'xor'},
+    0b0100011 : {0b010 : 'sw'},
     0b1100111 : {0b000 : 'jalr'},
     0b0000011 : {0b010 : 'lw'}
 }
@@ -24,7 +24,7 @@ types = {
     0b0010011 : 'I',
     0b1100011 : 'SB',
     0b0110011 : 'R',
-    0b0100011 : 'R',
+    0b0100011 : 'S',
     0b1100111 : 'UJ',
     0b0000011 : 'I'
 }
@@ -55,7 +55,8 @@ def reg_name(n):
     if n > 27 and n < 32:
         return 't{}'.format(n - 24)
 
-linecount = 0
+commands = []
+
 for line in lines:
     splitted = line.split()
     funct7 = int(splitted[1], 2)
@@ -72,6 +73,21 @@ for line in lines:
     if not fun_spec in opcodes[opcode]:
         opcodes[opcode].append(fun_spec)
 
+    commands.append([funct7, rs2, rs1, funct3, rd, opcode])
+
+for opcode in opcodes.keys():
+    stats.write('{:07b} : {}\n'.format(opcode, ' '.join(opcodes[opcode])))
+
+stats.close()
+
+linecount = 0
+for com in commands:
+    funct7 = com[0]
+    rs2 = com[1]
+    rs1 = com[2]
+    funct3 = com[3]
+    rd = com[4]
+    opcode = com[5]
 
     command = opcodes_str[opcode][funct3]
 
@@ -82,28 +98,24 @@ for line in lines:
 
     if types[opcode] == 'I':
         immediat = funct7 << 5 | rs2
-        fmt_string = '{} {}, {}, #{}'.format(command, reg_name(rd), reg_name(rs1), immediat)
+        fmt_string = '{} {}, {}, {}'.format(command, reg_name(rd), reg_name(rs1), immediat)
     elif types[opcode] == 'S':
-        immediat = (funct7 << 5 | rs2) << 5 | rd
-        fmt_string = '{} {}, #{}'.format(command, reg_name(rs1), immediat)
+        immediat = funct7 << 5 | rd
+        fmt_string = '{} {}, {}({})'.format(command, reg_name(rs2), immediat, reg_name(rs2))
     elif types[opcode] == 'R':
         fmt_string = '{} {}, {}, {}'.format(command, reg_name(rd), reg_name(rs1), reg_name(rs2))
     elif types[opcode] == 'UJ':
-        temp = ((funct7 << 5 | rs2) << 5 | rs1) << 3 | funct3
-        immediat = temp & (1 << 20) | (temp & 255) << 12 | (temp & 0b11111111111 << 9) >> 8 | (temp & (1 << 7)) << 3 
+        temp1 = funct7 << 5 | rs2 #12
+        temp2 = rs1 << 3 | funct3 #8
+        immediat = (temp1 & 1 << 12) | (temp2 << 12) | (temp1 & 1) << 11 | (temp1 & 0x3ff) << 1
 
-        fmt_string = '{} {}, #{}'.format(command, reg_name(rd), immediat)
+        fmt_string = '{} {}, {}'.format(command, reg_name(rd), immediat)
     elif types[opcode] == 'SB':
         temp = funct7 << 5 | rd
-        immediat = temp
-        fmt_string = '{}, {}, {}, #{}'.format(command, reg_name(rs1), reg_name(rs2), immediat)
+        immediat = (temp >> 1) << 2 | (temp & 1) << 11; 
+        fmt_string = '{} {}, {}, {}'.format(command, reg_name(rs2), reg_name(rs1), immediat)
     
     linecount += 4
-    output.write("{:02x}: {}\t[{}]\n".format(linecount, fmt_string, types[opcode]))
+    output.write("{}\n".format(fmt_string))
 
-for opcode in opcodes.keys():
-
-    stats.write('{:07b} : {}\n'.format(opcode, ' '.join(opcodes[opcode])))
-
-stats.close()
 output.close()
