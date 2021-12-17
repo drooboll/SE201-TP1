@@ -25,7 +25,7 @@ types = {
     0b1100011 : 'SB',
     0b0110011 : 'R',
     0b0100011 : 'S',
-    0b1100111 : 'UJ',
+    0b1100111 : 'I',
     0b0000011 : 'I'
 }
 
@@ -80,7 +80,10 @@ for opcode in opcodes.keys():
 
 stats.close()
 
+labels = []
+
 linecount = 0
+processed = []
 for com in commands:
     funct7 = com[0]
     rs2 = com[1]
@@ -104,18 +107,21 @@ for com in commands:
         fmt_string = '{} {}, {}({})'.format(command, reg_name(rs2), immediat, reg_name(rs2))
     elif types[opcode] == 'R':
         fmt_string = '{} {}, {}, {}'.format(command, reg_name(rd), reg_name(rs1), reg_name(rs2))
-    elif types[opcode] == 'UJ':
-        temp1 = funct7 << 5 | rs2 #12
-        temp2 = rs1 << 3 | funct3 #8
-        immediat = (temp1 & 1 << 12) | (temp2 << 12) | (temp1 & 1) << 11 | (temp1 & 0x3ff) << 1
-
-        fmt_string = '{} {}, {}'.format(command, reg_name(rd), immediat)
     elif types[opcode] == 'SB':
-        temp = funct7 << 5 | rd
-        immediat = (temp >> 1) << 2 | (temp & 1) << 11; 
-        fmt_string = '{} {}, {}, {}'.format(command, reg_name(rs2), reg_name(rs1), immediat)
+        immediat = (rd & 0b11110) | (rd & 1) << 11 | (funct7 & 0x3f) << 5
+        if (funct7 & 1 << 6) >> 6 == 1:
+            immediat = immediat - 4096
+        labels.append(linecount + immediat)
+
+        fmt_string = '{} {}, {}, _label{}'.format(command, reg_name(rs2), reg_name(rs1), linecount + immediat)
     
     linecount += 4
-    output.write("{}\n".format(fmt_string))
+    processed.append(fmt_string)
+
+for i in range(len(processed)):
+    c = processed[i]
+    if i * 4 in labels:
+        output.write('_label{}:\n'.format(i * 4))
+    output.write("{}\n".format(c))
 
 output.close()
