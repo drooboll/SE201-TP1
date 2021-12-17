@@ -101,7 +101,15 @@ for com in commands:
 
     if types[opcode] == 'I':
         immediat = funct7 << 5 | rs2
+        if immediat & 1 << 11:
+            immediat = (immediat ^ 1 << 11) - 2048
         fmt_string = '{} {}, {}, {}'.format(command, reg_name(rd), reg_name(rs1), immediat)
+
+        # Add sugar here
+        if command == 'addi' and immediat == 0:
+            fmt_string = 'mv {}, {}'.format(reg_name(rd), reg_name(rs1))
+        elif rd == 0 and reg_name(rs1) == 'ra':
+            fmt_string = 'ret'
     elif types[opcode] == 'S':
         immediat = funct7 << 5 | rd
         fmt_string = '{} {}, {}({})'.format(command, reg_name(rs2), immediat, reg_name(rs2))
@@ -114,6 +122,9 @@ for com in commands:
         labels.append(linecount + immediat)
 
         fmt_string = '{} {}, {}, _label{}'.format(command, reg_name(rs2), reg_name(rs1), linecount + immediat)
+
+        if rs2 == 0:
+            fmt_string = '{}z {}, _label{}'.format(command, reg_name(rs1), linecount + immediat)
     
     linecount += 4
     processed.append(fmt_string)
