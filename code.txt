@@ -3,24 +3,24 @@ mv a0, a3
 beqz a7, _label72
 beqz a1, _label80
 beqz a2, _label80
-bge a3, zero, _label84
+blez a3, _label84
 mv a5, a7
 slli a4, a3, 2
 add a7, a7, a4
 _label36:
-lw a4, a5, 0
-lw a6, a1, 0
+lw a4, 0(a5)
+lw a6, 0(a1)
 add a4, a4, a6
-sw a4, 0(a4)
+sw a4, 0(a2)
 addi a5, a5, 4
 addi a1, a1, 4
 addi a2, a2, 4
-bne a7, a5, _label36
+bne a5, a7, _label36
 ret
 _label72:
-addi a0, zero, -1
+li a0, -1
 ret
 _label80:
-addi a0, zero, -1
+li a0, -1
 _label84:
 ret

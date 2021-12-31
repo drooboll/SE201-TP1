@@ -57,6 +57,9 @@ def reg_name(n):
 
 commands = []
 
+sugar_enable = True
+annotation_enable = False
+
 for line in lines:
     splitted = line.split()
     funct7 = int(splitted[1], 2)
@@ -106,13 +109,20 @@ for com in commands:
         fmt_string = '{} {}, {}, {}'.format(command, reg_name(rd), reg_name(rs1), immediat)
 
         # Add sugar here
-        if command == 'addi' and immediat == 0:
-            fmt_string = 'mv {}, {}'.format(reg_name(rd), reg_name(rs1))
-        elif rd == 0 and reg_name(rs1) == 'ra':
-            fmt_string = 'ret'
+        if sugar_enable:
+            if command == 'addi':
+                if immediat == 0:
+                    fmt_string = 'mv {}, {}'.format(reg_name(rd), reg_name(rs1))
+                elif rs1 == 0:
+                    fmt_string = 'li {}, {}'.format(reg_name(rd), immediat)
+            elif rd == 0 and reg_name(rs1) == 'ra':
+                fmt_string = 'ret'
+            elif command == 'lw':
+                fmt_string = '{} {}, {}({})'.format(command, reg_name(rd), immediat, reg_name(rs1))
+
     elif types[opcode] == 'S':
         immediat = funct7 << 5 | rd
-        fmt_string = '{} {}, {}({})'.format(command, reg_name(rs2), immediat, reg_name(rs2))
+        fmt_string = '{} {}, {}({})'.format(command, reg_name(rs2), immediat, reg_name(rs1))
     elif types[opcode] == 'R':
         fmt_string = '{} {}, {}, {}'.format(command, reg_name(rd), reg_name(rs1), reg_name(rs2))
     elif types[opcode] == 'SB':
@@ -121,13 +131,22 @@ for com in commands:
             immediat = immediat - 4096
         labels.append(linecount + immediat)
 
-        fmt_string = '{} {}, {}, _label{}'.format(command, reg_name(rs2), reg_name(rs1), linecount + immediat)
+        fmt_string = '{} {}, {}, _label{}'.format(command, reg_name(rs1), reg_name(rs2), linecount + immediat)
 
-        if rs2 == 0:
-            fmt_string = '{}z {}, _label{}'.format(command, reg_name(rs1), linecount + immediat)
+        if sugar_enable:
+            if command == 'beq' and rs2 == 0:
+                fmt_string = 'beqz {}, _label{}'.format(reg_name(rs1), linecount + immediat)
+        
+            elif command == 'bge' and rs1 == 0:
+                fmt_string = 'blez {}, _label{}'.format(reg_name(rs2), linecount + immediat)
+
     
     linecount += 4
-    processed.append(fmt_string)
+    
+    if not annotation_enable:
+        processed.append(fmt_string)
+    else:
+        processed.append(fmt_string + " [{}]".format(types[opcode]))
 
 for i in range(len(processed)):
     c = processed[i]
