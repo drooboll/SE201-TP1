@@ -1,0 +1,13 @@
+#Reg used:
+a0 -- temp + retval (error code)
+a1 -- inc/mem + load addr
+a2 -- inc/mem + store addr
+a3 -- 
+a4 --
+a5 -- inc/mem + load addr
+
+a0 -- load addr 1
+a1 -- load addr 2
+a2 -- store for sum
+a3 -- amount of words
+retval : # of copied words
