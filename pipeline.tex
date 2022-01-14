@@ -1,0 +1,35 @@
+\begin{table}
+  \centering
+  \begin{tabular}{lllllllllllllllllllllllllllllllllllll} 
+  \textbf{mv a7, a0} &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{mv a0, a3} &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{beqz a7, _label72} &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{beqz a1, _label80} &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{beqz a2, _label80} &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{blez a3, _label84} &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{mv a5, a7} &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{sllii a4, a3, 2} &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{add a7, a7, a4} &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  & Forwarding: a4 from stage EX &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{lw a4, 0(a5)} &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{lw a6, 0(a1)} &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{add a4, a4, a6} &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & ID & EX & MEM & WB &  & Stalling: a4 and a6 are not yet loaded &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{sw a4, 0(a2)} &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & IF & ID & EX & MEM & WB &  & Stalling: a6 is not yet loaded &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{addi a5, a5, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{addi a1, a1, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{addi a2, a2, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{bne a5, a7, _loop} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  & Flush: branch is taken &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{ret} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & xx & xx & xx &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{li a0, -1} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & xx & xx & xx & xx &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{lw a4, 0(a5)} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{lw a6, 0(a1)} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  \\ 
+  \textbf{add a4, a4, a6} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & ID & EX & MEM & WB &  & Stalling: a4 and a6 are not yet loaded &  &  &  &  &  \\ 
+  \textbf{sw a4, 0(a2)} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & IF & ID & EX & MEM & WB &  & Stalling: a6 is not yet loaded &  &  &  &  \\ 
+  \textbf{addi a5, a5, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  \\ 
+  \textbf{addi a1, a1, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  \\ 
+  \textbf{addi a2, a2, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  \\ 
+  \textbf{bne a5, a7, _loop} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  \\ 
+  \textbf{ret} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  \\ 
+  \textbf{li a0 ,  -1} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & xx & xx & xx \\ 
+  \textbf{ret} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & xx & xx & xx \\ 
+  \end{tabular}
+\end{table}
