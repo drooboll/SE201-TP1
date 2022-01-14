@@ -1,0 +1,50 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage{adjustbox}
+\usepackage{lscape}
+\usepackage{tabulary}
+\usepackage[left=2cm,right=2cm,
+    top=1.5cm,bottom=1.5cm,bindingoffset=0cm]{geometry}
+\begin{document}
+\begin{landscape}
+\begin{table}
+  \caption{Pipeline execution}
+  \tiny
+  \centering
+  \setlength{\tabcolsep}{2pt}
+  \def\arraystretch{1.5}
+  \begin{tabular}{l|lllllllllllllllllllllllllllllllllll}
+  \texttt{Instruction} & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 & 26 & 27 & 28 & 29 & 30 & 31 & 32 & 33 & 34\\ \hline \hline
+  \texttt{mv a7, a0} & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{mv a0, a3} &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{beqz a7, \_label72} &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{beqz a1, \_label80} &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{beqz a2, \_label80} &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{blez a3, \_label84} &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{mv a5, a7} &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{sllii a4, a3, 2} &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{add a7, a7, a4} &  &  &  &  &  &  &  &  & IF & ID & \textbf{EX} & MEM & WB &  & \multicolumn{6}{c}{Forwarding: a4 from stage EX} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{lw a4, 0(a5)} &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{lw a6, 0(a1)} &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{add a4, a4, a6} &  &  &  &  &  &  &  &  &  &  &  & IF & \underline{ID} & \underline{ID} & EX & MEM & WB &  & \multicolumn{8}{c}{Stalling: a4 and a6 are not yet loaded} &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{sw a4, 0(a2)} &  &  &  &  &  &  &  &  &  &  &  &  & \underline{IF} & \underline{IF} & ID & EX & MEM & WB &  & \multicolumn{6}{c}{Stalling: a6 is not yet loaded}  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{addi a5, a5, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{addi a1, a1, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{addi a2, a2, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{bne a5, a7, \_loop} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  & \multicolumn{4}{c}{Flush: branch is taken} & &  &  &  &  &  &  &  \\ 
+  \texttt{ret} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & xx & xx & xx &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{li a0, -1} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & xx & xx & xx & xx &  &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{lw a4, 0(a5)} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{lw a6, 0(a1)} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  &  &  &  &  \\ 
+  \texttt{add a4, a4, a6} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & \underline{ID} & \underline{ID} & EX & MEM & WB &  & \multicolumn{6}{c}{Stalling: a4 and a6 are not yet loaded} \\ 
+  \texttt{sw a4, 0(a2)} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & \underline{IF} & \underline{IF} & ID & EX & MEM & WB &  & \multicolumn{5}{c}{Stalling: a6 is not yet loaded}\\ 
+  \texttt{addi a5, a5, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  &  \\ 
+  \texttt{addi a1, a1, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  &  \\ 
+  \texttt{addi a2, a2, 4} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  &  \\ 
+  \texttt{bne a5, a7, \_loop} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  &  \\ 
+  \texttt{ret} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & EX & MEM & WB &  \\ 
+  \texttt{li a0 ,  -1} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & ID & xx & xx & xx \\ 
+  \texttt{ret} &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  & IF & xx & xx & xx \\ 
+  \end{tabular}
+\end{table}
+\end{landscape}
+\end{document}
